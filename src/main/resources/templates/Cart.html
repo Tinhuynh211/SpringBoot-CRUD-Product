@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header Styling */
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 18px;
+        }
+
+        header a:hover {
+            text-decoration: underline;
+        }
+
+        /* Container for the content */
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        td {
+            background-color: #fafafa;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .total-amount {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .payment-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 30px;
+        }
+
+        .payment-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header with navigation links -->
+<header>
+    <a href="/identity/products">Products</a>
+    <a href="/identity/users">Users</a>
+    <a href="/identity/cart">Cart</a>
+    <a href="/orders">Orders</a>
+</header>
+
+<div class="container">
+    <h2 >Your Cart:</h2>
+    <h3>User ID: <span th:text="${userId}"></span></h3>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Order Item ID</th>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>Prize</th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="orderItem : ${orderItems}">
+            <tr>
+                <td th:text="${orderItem.orderItemId}"></td>
+                <td th:text="${orderItem.product.productName}"></td>
+                <td th:text="${orderItem.quantity}"></td>
+                <td th:text="${orderItem.prize}"></td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+
+    <!-- Total Amount -->
+    <div class="total-amount">
+        <h3>Total: <span th:text="${totalAmountItem}"></span></h3>
+    </div>
+
+    <!-- Proceed to Payment -->
+    <form th:action="@{/payment}" method="post">
+        <input type="hidden" name="userId" th:value="${userId}" />
+        <input type="hidden" name="orderIds" th:value="${orderIds}" />
+        <button type="submit">Proceed to Payment</button>
+    </form>
+
+</div>
+
+</body>
+</html>

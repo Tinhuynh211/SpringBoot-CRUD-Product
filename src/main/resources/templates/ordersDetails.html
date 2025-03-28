@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+    <style>
+        /* Thêm style tùy chỉnh nếu cần */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        td {
+            background-color: #fafafa;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Order Details</h2>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Order Item ID</th>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="orderItem : ${orderItems}">
+            <tr>
+                <td th:text="${orderItem.orderItemId}"></td>
+                <td th:text="${orderItem.product.productName}"></td>
+                <td th:text="${orderItem.quantity}"></td>
+                <td th:text="${orderItem.prize}"></td>
+                <td th:text="${orderItem.prize.multiply(orderItem.quantity)}"></td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+
+    <a href="/identity/cart">
+        <button>Back to Cart</button>
+    </a>
+</div>
+
+</body>
+</html>

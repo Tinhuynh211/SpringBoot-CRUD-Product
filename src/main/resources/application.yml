@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:sqlserver://localhost:1433;databaseName=DB2;encrypt=false;trustServerCertificate=true
+    username: sa
+    password: 324095589
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  jpa:
+    database-platform: org.hibernate.dialect.SQLServerDialect
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+    defer-datasource-initialization: true
+
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+
+
+
+server:
+  port: 8080
+  servlet:
+    context-path: /identity

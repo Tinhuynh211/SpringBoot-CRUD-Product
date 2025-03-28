@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart</title>
+    <style>
+        /* CSS Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+
+        td {
+            background-color: #fafafa;
+        }
+
+        .checkout-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+
+        .checkout-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="/identity/products">Products</a>
+    <a href="/identity/users">Users</a>
+    <a href="/identity/users">Cart</a>
+    <a href="/orders">Orders</a>
+</header>
+
+<div class="container">
+    <h1>Your Shopping Cart</h1>
+    <h2>Welcome, <span th:text="${user.userName}"></span>!</h2>
+    <table>
+        <tr>
+            <th>Product Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Action</th>
+        </tr>
+        <th:block th:each="product : ${products}">
+            <tr>
+                <td th:text="${product.productName}"></td>
+                <td th:text="${product.category.categoryName}"></td>
+                <td th:text="${product.productPrice}"></td>
+                <td>
+                    <form action="/identity/products/add-to-cart" method="post">
+                        <input type="hidden" name="productId" th:value="${product.productId}" />
+                        <input type="hidden" name="userId" th:value="${user.userId}" />
+                        <button type="submit">Add to Cart</button>
+                    </form>
+                </td>
+            </tr>
+        </th:block>
+    </table>
+    <form th:action="@{/products/checkout}" method="post">
+        <input type="hidden" name="userId" th:value="${user.userId}" />
+        <button type="submit" class="checkout-btn">Proceed to Checkout</button>
+    </form>
+</div>
+
+</body>
+</html>
