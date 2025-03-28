@@ -92,10 +92,7 @@
 
 <!-- Header with navigation links -->
 <header>
-    <a href="/identity/products">Products</a>
     <a href="/identity/users">Users</a>
-    <a href="/identity/cart">Cart</a>
-    <a href="/orders">Orders</a>
 </header>
 
 <div class="container">
@@ -104,21 +101,32 @@
     <table>
         <thead>
         <tr>
+            <th>Status</th>
             <th>Order Date</th>
             <th>Total Amount</th>
-            <th>Action</th>
+            <th>Detail</th>
+            <th>Payment</th>
+
         </tr>
         </thead>
         <tbody>
         <th:block th:each="order : ${orders}">
             <tr>
+                <td th:text="${order.statusMessage}"></td>
                 <td th:text="${order.orderDate}"></td>
                 <td th:text="${order.totalAmount}"></td>
                 <td>
-                    <a th:href="@{/order/{orderId}/details(orderId=${order.orderId}, userId=${user.userId})}">
+                    <a th:href="@{/item/order/{orderId}/details(orderId=${order.orderId}, userId=${user.userId})}">
                         <button>View Order Details</button>
                     </a>
                 </td>
+                <td>
+                    <a th:if="${order.status == false}" th:href="@{/order/payment/{orderId}(orderId=${order.orderId}, userId=${user.userId})}">
+                        <button>Payment</button>
+                    </a>
+                </td>
+
+
             </tr>
         </th:block>
         </tbody>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Payment Confirmation</title>
+</head>
+<body>
+<h1>Thanh toán thành công!</h1>
+<p>Đơn hàng của bạn đã được thanh toán thành công. Chi tiết đơn hàng:</p>
+<ul>
+  <li>Order ID: <span th:text="${order.orderId}"></span></li>
+  <li>Total Amount: <span th:text="${order.totalAmount}"></span></li>
+  <li>Status: <span th:text="${order.status == true ? 'Success' : 'Pending'}"></span></li>
+</ul>
+</body>
+</html>

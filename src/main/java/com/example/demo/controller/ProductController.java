@@ -70,37 +70,81 @@ public class ProductController {
 
     @PostMapping("/checkout")
     public String checkout(@RequestParam("userId") int userId, Model model) {
-        // Lấy thông tin người dùng
         User user = userService.getUserById(userId);
+        List<Product> cart = userCarts.getOrDefault(userId, new ArrayList<>());
 
-        // Lấy danh sách các OrderItem của người dùng từ bảng OrderItem
-        List<OrderItem> orderItems = orderItemRepository.findByOrdersUserUserId(userId);
+        if (cart.isEmpty()) {
+            List<OrderItem> orderItems = orderItemRepository.findByOrdersUserUserId(userId);
 
-        // Kiểm tra xem danh sách OrderItem có rỗng không
-        if (orderItems.isEmpty()) {
-            model.addAttribute("message", "Không có sản phẩm trong giỏ hàng.");
-            return "Cart"; // Trả về trang giỏ hàng nếu không có sản phẩm
+            if (orderItems.isEmpty()) {
+                model.addAttribute("message", "Giỏ hàng của bạn trống!");
+                return "Cart";
+            }
+
+            int currentOrderId = orderItems.get(0).getOrders().getOrderId();
+            List<OrderItem> currentOrderItems = orderItemRepository.findByOrdersOrderId(currentOrderId);
+            BigDecimal totalAmountItem = currentOrderItems.stream()
+                    .map(orderItem -> orderItem.getPrize().multiply(BigDecimal.valueOf(orderItem.getQuantity())))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+
+            model.addAttribute("orderItems", currentOrderItems);
+            model.addAttribute("totalAmountItem", totalAmountItem);
+            model.addAttribute("message", "Giỏ hàng của bạn trống! Vui lòng thêm sản phẩm vào giỏ.");
+            return "Cart";
         }
 
-        // Lấy orderId và userId từ OrderItem và Orders
-        List<Integer> orderIds = new ArrayList<>();
-        for (OrderItem orderItem : orderItems) {
-            orderIds.add(orderItem.getOrders().getOrderId()); // Lấy orderId từ Orders
+        // Nếu giỏ hàng không trống
+        BigDecimal totalAmount = cart.stream()
+                .map(product -> product.getProductPrice().multiply(BigDecimal.valueOf(1))) // Giả sử mỗi sản phẩm có số lượng = 1
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // Tạo đơn hàng mới
+        Orders order = new Orders();
+        order.setUser(user);
+        order.setOrderDate(LocalDateTime.now());
+        order.setTotalAmount(totalAmount);
+        orderRepository.save(order);  // Lưu đơn hàng mới vào cơ sở dữ liệu
+
+        // Lưu các OrderItem vào bảng OrderItem
+        for (Product product : cart) {
+            // Kiểm tra xem sản phẩm đã có trong đơn hàng chưa
+            OrderItem existingOrderItem = orderItemRepository.findByOrdersAndProduct(order, product);
+
+            if (existingOrderItem != null) {
+                // Nếu có, cập nhật số lượng và giá
+                existingOrderItem.setQuantity(existingOrderItem.getQuantity() + 1);
+                existingOrderItem.setPrize(product.getProductPrice().multiply(BigDecimal.valueOf(existingOrderItem.getQuantity())));
+                orderItemRepository.save(existingOrderItem);  // Cập nhật vào cơ sở dữ liệu
+            } else {
+                // Nếu chưa có, tạo OrderItem mới
+                OrderItem orderItem = new OrderItem();
+                orderItem.setProduct(product);
+                orderItem.setQuantity(1);  // Giả sử mỗi lần thêm vào giỏ hàng là 1
+                orderItem.setPrize(product.getProductPrice());
+                orderItem.setDeleteFlg(false);  // Đánh dấu chưa bị xóa
+                orderItem.setOrders(order);
+                orderItemRepository.save(orderItem);  // Lưu vào cơ sở dữ liệu
+            }
         }
 
-        // Lấy totalAmount cho mỗi OrderItem
+        // Làm sạch giỏ hàng sau khi thanh toán
+        userCarts.put(userId, new ArrayList<>());  // Xóa giỏ hàng tạm thời
+
+        // Lấy tất cả các OrderItem của đơn hàng hiện tại (sử dụng order.getOrderId() của đơn hàng mới tạo)
+        List<OrderItem> orderItems = orderItemRepository.findByOrdersOrderId(order.getOrderId());
+        model.addAttribute("orderItems", orderItems);
+
+        // Tính tổng số tiền từ các OrderItem
         BigDecimal totalAmountItem = orderItems.stream()
                 .map(orderItem -> orderItem.getPrize().multiply(BigDecimal.valueOf(orderItem.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        // Đưa thông tin vào model để hiển thị trong view
-        model.addAttribute("orderItems", orderItems);
         model.addAttribute("totalAmountItem", totalAmountItem);
-        model.addAttribute("userId", userId);
-        model.addAttribute("orderIds", orderIds); // Truyền orderIds cho view
 
-        return "Cart";  // Trả về trang Cart
+        return "Cart"; // Trả về trang Cart
     }
+
+
 
 
 

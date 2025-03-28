@@ -21,11 +21,13 @@ public class OrderItemController {
     private OrderItemRepository orderItemRepository;
 
     @GetMapping("/order/{orderId}/details")
-    public String getOrderDetails(@PathVariable("orderId") int orderId, @RequestParam("userId") int userId, Model model) {
-        List<OrderItem> orderItems = orderItemRepository.findByOrders_OrderIdAndOrders_User_UserId(orderId, userId);
-
-
+    public String getOrderDetails(@PathVariable("orderId") int orderId,
+                                  @RequestParam("userId") int userId,
+                                  Model model) {
+        List<OrderItem> orderItems = orderItemRepository
+                .findByOrders_OrderIdAndOrders_User_UserId(orderId, userId);
         model.addAttribute("orderItems", orderItems);
-        return "ordersDetails";  // Trả về trang chi tiết order
+        System.out.println(orderItems);
+        return "ordersDetails";
     }
 }
