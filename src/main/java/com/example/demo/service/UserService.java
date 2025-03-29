@@ -4,6 +4,7 @@ package com.example.demo.service;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,4 +24,15 @@ public class UserService {
         Optional<User> user = userRepository.findById(userId);
         return user.orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
     }
+
+    @Transactional
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteUserById(int userId) {
+        userRepository.deleteById(userId);
+    }
+
 }
