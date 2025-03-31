@@ -94,54 +94,45 @@ public class ProductController {
             return "Cart";
         }
 
-        // Nếu giỏ hàng không trống
         BigDecimal totalAmount = cart.stream()
-                .map(product -> product.getProductPrice().multiply(BigDecimal.valueOf(1))) // Giả sử mỗi sản phẩm có số lượng = 1
+                .map(product -> product.getProductPrice().multiply(BigDecimal.valueOf(1))) 
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Tạo đơn hàng mới
         Orders order = new Orders();
         order.setUser(user);
         order.setOrderDate(LocalDateTime.now());
         order.setTotalAmount(totalAmount);
-        orderRepository.save(order);  // Lưu đơn hàng mới vào cơ sở dữ liệu
+        orderRepository.save(order);  
 
-        // Lưu các OrderItem vào bảng OrderItem
         for (Product product : cart) {
-            // Kiểm tra xem sản phẩm đã có trong đơn hàng chưa
             OrderItem existingOrderItem = orderItemRepository.findByOrdersAndProduct(order, product);
 
             if (existingOrderItem != null) {
-                // Nếu có, cập nhật số lượng và giá
                 existingOrderItem.setQuantity(existingOrderItem.getQuantity() + 1);
                 existingOrderItem.setPrize(product.getProductPrice().multiply(BigDecimal.valueOf(existingOrderItem.getQuantity())));
-                orderItemRepository.save(existingOrderItem);  // Cập nhật vào cơ sở dữ liệu
+                orderItemRepository.save(existingOrderItem); 
             } else {
-                // Nếu chưa có, tạo OrderItem mới
                 OrderItem orderItem = new OrderItem();
                 orderItem.setProduct(product);
-                orderItem.setQuantity(1);  // Giả sử mỗi lần thêm vào giỏ hàng là 1
+                orderItem.setQuantity(1);  
                 orderItem.setPrize(product.getProductPrice());
-                orderItem.setDeleteFlg(false);  // Đánh dấu chưa bị xóa
+                orderItem.setDeleteFlg(false);  
                 orderItem.setOrders(order);
-                orderItemRepository.save(orderItem);  // Lưu vào cơ sở dữ liệu
+                orderItemRepository.save(orderItem); 
             }
         }
 
-        // Làm sạch giỏ hàng sau khi thanh toán
-        userCarts.put(userId, new ArrayList<>());  // Xóa giỏ hàng tạm thời
+        userCarts.put(userId, new ArrayList<>());  
 
-        // Lấy tất cả các OrderItem của đơn hàng hiện tại (sử dụng order.getOrderId() của đơn hàng mới tạo)
         List<OrderItem> orderItems = orderItemRepository.findByOrdersOrderId(order.getOrderId());
         model.addAttribute("orderItems", orderItems);
 
-        // Tính tổng số tiền từ các OrderItem
         BigDecimal totalAmountItem = orderItems.stream()
                 .map(orderItem -> orderItem.getPrize().multiply(BigDecimal.valueOf(orderItem.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         model.addAttribute("totalAmountItem", totalAmountItem);
 
-        return "Cart"; // Trả về trang Cart
+        return "Cart"; 
     }
 
 
