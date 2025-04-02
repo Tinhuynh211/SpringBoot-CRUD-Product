@@ -96,14 +96,8 @@
 </header>
 
 <div class="container">
-    <h2>Order List</h2>
+    <h2>Filtered List In Month</h2>
     <h2>Welcome, <span th:text="${user.userName}"></span>!</h2>
-    <a th:href="@{/order/list/filtered?userId={userId}(userId=${user.userId})}" >
-        <button>Filter Order </button>
-    </a>
-    <a style="margin-left: 20px" th:href="@{/order/list/getMonth?userId={userId}(userId=${user.userId})}" >
-        <button>Filter Order In Month </button>
-    </a>
     <table>
         <thead>
         <tr>
@@ -116,7 +110,7 @@
         </tr>
         </thead>
         <tbody>
-        <th:block th:each="order : ${orders}">
+        <th:block th:each="order : ${orderListFiltered}">
             <tr>
                 <td th:text="${order.statusMessage}"></td>
                 <td th:text="${order.orderDate}"></td>
@@ -137,6 +131,7 @@
         </th:block>
         </tbody>
     </table>
+    <h3>Total: <span th:text="${totalAmountInMonth}"></span></h3>
 </div>
 
 </body>

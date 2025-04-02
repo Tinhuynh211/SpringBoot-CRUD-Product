@@ -13,7 +13,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/order")
@@ -37,56 +40,79 @@ public class OrderController {
         return "orderList";
     }
 
-    // Hiển thị trang thanh toán với thông tin đơn hàng
     @GetMapping("/payment/{orderId}")
     public String showPaymentPage(@PathVariable("orderId") int orderId, @RequestParam("userId") int userId, Model model) {
-        // Lấy thông tin người dùng và đơn hàng
         User user = userService.getUserById(userId);
         Orders order = orderRepository.findById(orderId).orElse(null);
 
         if (order == null || order.getUser().getUserId() != userId) {
             model.addAttribute("message", "Đơn hàng không hợp lệ!");
-            return "errorPage";  // Trang lỗi nếu đơn hàng không hợp lệ
+            return "errorPage";
         }
 
-        // Lấy danh sách OrderItem của đơn hàng
         List<OrderItem> orderItems = orderItemRepository.findByOrdersOrderId(orderId);
 
-        // Tính tổng số tiền từ các OrderItem
         BigDecimal totalAmount = orderItems.stream()
                 .map(orderItem -> orderItem.getPrize().multiply(BigDecimal.valueOf(orderItem.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Thêm thông tin vào model
         model.addAttribute("order", order);
         model.addAttribute("orderItems", orderItems);
         model.addAttribute("totalAmount", totalAmount);
         model.addAttribute("user", user);
 
-        return "Payment";  // Trả về trang payment
+        return "Payment";
     }
 
-    // Xử lý thanh toán khi người dùng nhấn nút thanh toán
     @PostMapping("/confirm/{orderId}")
     public String processPayment(@PathVariable("orderId") int orderId, @RequestParam("userId") int userId, Model model) {
-        // Lấy thông tin người dùng
         User user = userService.getUserById(userId);
 
-        // Lấy đơn hàng hiện tại dựa trên orderId
         Orders order = orderRepository.findById(orderId).orElse(null);
         if (order == null || order.getUser().getUserId() != userId) {
             model.addAttribute("message", "Đơn hàng không hợp lệ!");
-            return "errorPage"; // Trả về trang lỗi nếu đơn hàng không hợp lệ
+            return "errorPage";
         }
 
-        // Cập nhật trạng thái của đơn hàng thành đã thanh toán
         order.setStatus(true);
-        orderRepository.save(order); // Lưu lại thay đổi vào database
-
-        // Cập nhật trang xác nhận thanh toán thành công
+        orderRepository.save(order);
+        model.addAttribute("user", user);
         model.addAttribute("message", "Thanh toán thành công!");
-        model.addAttribute("order", order); // Truyền đơn hàng cho trang xác nhận
-        return "orderConfirmation"; // Trang xác nhận thanh toán
+        model.addAttribute("order", order);
+        return "orderConfirmation";
+    }
+
+    @GetMapping ("/list/filtered")
+    public String processFilteredPayment(@RequestParam("userId") int userId, Model model) {
+        BigDecimal amount1 = new BigDecimal("10000");
+        User user = userService.getUserById(userId);
+        List<Orders> orders = orderRepository.findByUser_UserId(userId);
+        List <Orders> ordersFiltered = orders.stream().filter(order -> order.getTotalAmount().compareTo(amount1) > 0).collect(Collectors.toList());
+        System.out.println(ordersFiltered);
+        model.addAttribute("user", user);
+        model.addAttribute("ordersFiltered", ordersFiltered);
+        return "filteredList";
+    };
+
+    @GetMapping("/list/getMonth")
+    public String getOrderInMonth(@RequestParam("userId") int userId, Model model){
+        BigDecimal amount = new BigDecimal("0");
+        LocalDateTime now = LocalDateTime.now();
+        Month currentMonth = now.getMonth();
+
+        User user = userService.getUserById(userId);
+        List<Orders> orders = orderRepository.findByUser_UserId(userId);
+        List<Orders> orderListFiltered = orders.stream().filter(order -> order.getOrderDate().getMonth().equals(currentMonth)).collect(Collectors.toList());
+        BigDecimal totalAmountInMonth = orderListFiltered.stream().map(Orders::getTotalAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (orderListFiltered.isEmpty()) {
+            totalAmountInMonth = BigDecimal.ZERO;
+        }
+        model.addAttribute("user", user);
+        model.addAttribute("orderListFiltered", orderListFiltered);
+        model.addAttribute("totalAmountInMonth",totalAmountInMonth);
+        return"filteredListInMonth";
+
     }
 
 

@@ -144,17 +144,12 @@
         </tbody>
     </table>
 
-    <!-- Total Amount -->
+
     <div class="total-amount">
         <h3>Total: <span th:text="${totalAmountItem}"></span></h3>
     </div>
 
-    <!-- Proceed to Payment -->
-    <form th:action="@{/payment}" method="post">
-        <input type="hidden" name="userId" th:value="${userId}" />
-        <input type="hidden" name="orderIds" th:value="${orderIds}" />
-        <button type="submit">Proceed to Payment</button>
-    </form>
+
 
 </div>
 

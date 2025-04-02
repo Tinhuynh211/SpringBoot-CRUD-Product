@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
-    // Tìm OrderItem dựa trên Order và Product
+    
     OrderItem findByOrdersAndProduct(Orders order, Product product);
 
     List<OrderItem> findByOrdersUserUserId(int userId);

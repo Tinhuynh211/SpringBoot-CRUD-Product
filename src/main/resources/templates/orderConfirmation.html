@@ -1,15 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-  <title>Payment Confirmation</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thanh toán thành công</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
+    }
+    h1 {
+      color: #28a745;
+      font-size: 24px;
+    }
+    p {
+      font-size: 16px;
+      margin: 10px 0;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      font-size: 16px;
+      margin: 5px 0;
+    }
+    li span {
+      font-weight: bold;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #007bff;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      text-decoration: none;
+      margin-top: 20px;
+    }
+    .btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
 <body>
-<h1>Thanh toán thành công!</h1>
-<p>Đơn hàng của bạn đã được thanh toán thành công. Chi tiết đơn hàng:</p>
-<ul>
-  <li>Order ID: <span th:text="${order.orderId}"></span></li>
-  <li>Total Amount: <span th:text="${order.totalAmount}"></span></li>
-  <li>Status: <span th:text="${order.status == true ? 'Success' : 'Pending'}"></span></li>
-</ul>
+<div class="container">
+  <h1>Thanh toán thành công!</h1>
+  <h2>Welcome, <span th:text="${user.userName}"></span>!</h2>
+  <p>Đơn hàng của bạn đã được thanh toán thành công. Chi tiết đơn hàng:</p>
+  <ul>
+    <li>Order ID: <span th:text="${order.orderId}"></span></li>
+    <li>Total Amount: <span th:text="${order.totalAmount}"></span></li>
+    <li>Status: <span th:text="${order.status == true ? 'Success' : 'Pending'}"></span></li>
+  </ul>
+  <a th:href="@{/order/list?userId={userId}(userId=${user.userId})}">
+    <button class="btn">List Order</button>
+  </a>
+</div>
 </body>
 </html>
