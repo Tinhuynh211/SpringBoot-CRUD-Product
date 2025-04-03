@@ -21,6 +21,10 @@ public class Orders {
     private boolean deleteFlg;
     private boolean status;
 
+    public Orders() {
+
+    }
+
     public boolean isStatus() {
         return status;
     }
@@ -33,6 +37,14 @@ public class Orders {
     }
 
 
+    public Orders(int orderId, User user, LocalDateTime orderDate, BigDecimal totalAmount, boolean deleteFlg, boolean status) {
+        this.orderId = orderId;
+        this.user = user;
+        this.orderDate = orderDate;
+        this.totalAmount = totalAmount;
+        this.deleteFlg = deleteFlg;
+        this.status = status;
+    }
 
     public int getOrderId() {
         return orderId;

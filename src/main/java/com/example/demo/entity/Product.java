@@ -1,24 +1,33 @@
 package com.example.demo.entity;
 
-
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 
 @Entity
 public class Product {
+
     @Id
-    @GeneratedValue ( strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int productId;
+
     private String productName;
     private BigDecimal productPrice;
-
 
     @ManyToOne
     @JoinColumn(name = "categoryId")
     private Category category;
 
     private boolean deleteFlg;
+
+    public Product() {}
+
+    public Product(String productName, BigDecimal productPrice, Category category, boolean deleteFlg) {
+        this.productName = productName;
+        this.productPrice = productPrice;
+        this.category = category;
+        this.deleteFlg = deleteFlg;
+    }
 
     public int getProductId() {
         return productId;
@@ -71,3 +80,4 @@ public class Product {
                 '}';
     }
 }
+

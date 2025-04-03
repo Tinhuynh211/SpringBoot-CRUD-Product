@@ -104,9 +104,8 @@ public class ProductController {
         order.setUser(user);
         order.setOrderDate(LocalDateTime.now());
         order.setTotalAmount(totalAmount);
-        orderRepository.save(order);  // Lưu đơn hàng mới vào cơ sở dữ liệu
+        orderRepository.save(order);
 
-        // Lưu các OrderItem vào bảng OrderItem
         for (Product product : cart) {
             // Kiểm tra xem sản phẩm đã có trong đơn hàng chưa
             OrderItem existingOrderItem = orderItemRepository.findByOrdersAndProduct(order, product);
@@ -128,20 +127,19 @@ public class ProductController {
             }
         }
 
-        // Làm sạch giỏ hàng sau khi thanh toán
-        userCarts.put(userId, new ArrayList<>());  // Xóa giỏ hàng tạm thời
+        userCarts.put(userId, new ArrayList<>());
 
-        // Lấy tất cả các OrderItem của đơn hàng hiện tại (sử dụng order.getOrderId() của đơn hàng mới tạo)
+
         List<OrderItem> orderItems = orderItemRepository.findByOrdersOrderId(order.getOrderId());
         model.addAttribute("orderItems", orderItems);
 
-        // Tính tổng số tiền từ các OrderItem
+
         BigDecimal totalAmountItem = orderItems.stream()
                 .map(orderItem -> orderItem.getPrize().multiply(BigDecimal.valueOf(orderItem.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         model.addAttribute("totalAmountItem", totalAmountItem);
 
-        return "Cart"; // Trả về trang Cart
+        return "Cart";
     }
 
 
