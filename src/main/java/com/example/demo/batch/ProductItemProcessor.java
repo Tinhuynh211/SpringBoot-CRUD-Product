@@ -2,11 +2,9 @@ package com.example.demo.batch;
 
 import com.example.demo.entity.Category;
 import com.example.demo.entity.Product;
-import com.example.demo.repository.CategoryRepository;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -16,24 +14,22 @@ public class ProductItemProcessor implements ItemProcessor<Product, Product> {
 
     private static final Logger log = LoggerFactory.getLogger(ProductItemProcessor.class);
 
-
     @Override
-    public Product process(Product product) throws Exception {
+    public Product process(Product item) throws Exception {
+        if (item == null) {
+            throw new IllegalArgumentException("Product cannot be null");
+        }
 
-        int categoryId = product.getCategory().getCategoryId();
+        int categoryId = item.getCategory().getCategoryId();
+
         Category category = new Category();
         category.setCategoryId(categoryId);
 
-        final String productName = product.getProductName() != null ? product.getProductName().toUpperCase() : null;
-        final BigDecimal productPrice = product.getProductPrice() != null ? product.getProductPrice() : BigDecimal.ZERO;
-        final boolean deleteFlg = product.isDeleteFlg();
+        String productName = item.getProductName() != null ? item.getProductName().toUpperCase() : null;
+        BigDecimal productPrice = item.getProductPrice() != null ? item.getProductPrice() : BigDecimal.ZERO;
+        item.setCategory(category);  // Gán Category vào Product
+        log.info("Converting Product {} to Product with Category {}", item.getProductName(), category.getCategoryId());
 
-        final Product transformedProduct = new Product(productName, productPrice, category, deleteFlg);
-
-        if (product.getProductName() == null || product.getProductPrice() == null) {
-            throw new IllegalArgumentException("Missing product data");
-        }
-        log.info("Converting ({}) into ({})", product, transformedProduct);
-        return transformedProduct;
+        return item;
     }
 }

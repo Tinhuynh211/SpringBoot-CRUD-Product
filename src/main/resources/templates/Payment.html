@@ -61,37 +61,37 @@
 
 <div class="container">
     <h2>Payment Details</h2>
-    <p>Order ID: <span th:text="${order.orderId}"></span></p>
+<!--    <p>Order ID: <span th:text="${order.orderId}"></span></p>-->
     <p>Customer: <span th:text="${user.userName}"></span></p>
 
     <table>
         <thead>
         <tr>
-            <th>Product Name</th>
-            <th>Quantity</th>
             <th>Price</th>
+            <th>Date</th>
             <th>Total</th>
         </tr>
         </thead>
         <tbody>
-        <th:block th:each="orderItem : ${orderItems}">
+        <!-- Lặp qua cartOrder để hiển thị thông tin từng sản phẩm -->
+        <th:block th:each="order : ${order}">
             <tr>
-                <td th:text="${orderItem.product.productName}"></td>
-                <td th:text="${orderItem.quantity}"></td>
-                <td th:text="${orderItem.prize}"></td>
-                <td th:text="${orderItem.prize.multiply(orderItem.quantity)}"></td>
+                <td th:text="${order.totalAmount}"></td>
+                <td th:text="${order.orderDate}"></td>
+                <td th:text="${order.statusMessage}"></td>
             </tr>
         </th:block>
         </tbody>
     </table>
 
     <div class="total">
-        Total Amount: <span th:text="${totalAmount}"></span>
+        Total Amount: <span th:text="${grandTotal}"></span>
     </div>
 
-    <form th:action="@{/order/confirm/{orderId}(orderId=${order.orderId}, userId=${user.userId})}" method="post">
-        <button class="payment-btn" type="submit">Confirm Payment</button>
-    </form>
+<!--    &lt;!&ndash; Xác nhận thanh toán &ndash;&gt;-->
+<!--    <form th:action="@{/order/confirm/{orderId}(orderId=${order.orderId}, userId=${user.userId})}" method="post">-->
+<!--        <button class="payment-btn" type="submit">Confirm Payment</button>-->
+<!--    </form>-->
 </div>
 
 </body>

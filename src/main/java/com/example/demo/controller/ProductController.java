@@ -7,20 +7,26 @@ import com.example.demo.entity.Product;
 import com.example.demo.entity.User;
 import com.example.demo.repository.OrderItemRepository;
 import com.example.demo.repository.OrderRepository;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.service.OrderItemService;
+import com.example.demo.service.OrderService;
 import com.example.demo.service.ProductService;
 import com.example.demo.service.UserService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ArrayList;
+import java.util.*;
 
 
 @Controller
@@ -38,9 +44,14 @@ public class ProductController {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    UserRepository  userRepository;
+
     private Map<Integer, List<Product>> userCarts = new HashMap<>();
     @Autowired
     private OrderItemService orderItemService;
+    @Autowired
+    private OrderService orderService;
 
     @GetMapping
     public String getProducts(Model model) {
@@ -50,97 +61,27 @@ public class ProductController {
 
 
     @GetMapping("/user")
-    public String getProductsPage(@RequestParam("userId") int userId, Model model) {
+    public String getProductsPage(@RequestParam("userId") int userId, Model model, HttpSession session ){
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/";
+        }
         User user = userService.getUserById(userId);
         model.addAttribute("user", user);
         model.addAttribute("products", productService.findAll());
         return "productList";
     }
 
-    @PostMapping("/add-to-cart")
-    public String addToCart(@RequestParam("userId") int userId, @RequestParam("productId") int productId, Model model) {
-        User user = userService.getUserById(userId);
-        Product product = productService.getProductById(productId);
-        List<Product> cart = userCarts.getOrDefault(userId, new ArrayList<>());
-        cart.add(product);
-        userCarts.put(userId, cart);
-        System.out.println(userCarts);
-        return "redirect:/products/user?userId=" + userId;
-    }
-
-    @PostMapping("/checkout")
-    public String checkout(@RequestParam("userId") int userId, Model model) {
-        User user = userService.getUserById(userId);
-        List<Product> cart = userCarts.getOrDefault(userId, new ArrayList<>());
-
-        if (cart.isEmpty()) {
-            List<OrderItem> orderItems = orderItemRepository.findByOrdersUserUserId(userId);
-
-            if (orderItems.isEmpty()) {
-                model.addAttribute("message", "Giỏ hàng của bạn trống!");
-                return "Cart";
-            }
-
-            int currentOrderId = orderItems.get(0).getOrders().getOrderId();
-            List<OrderItem> currentOrderItems = orderItemRepository.findByOrdersOrderId(currentOrderId);
-            BigDecimal totalAmountItem = currentOrderItems.stream()
-                    .map(orderItem -> orderItem.getPrize().multiply(BigDecimal.valueOf(orderItem.getQuantity())))
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
 
-            model.addAttribute("orderItems", currentOrderItems);
-            model.addAttribute("totalAmountItem", totalAmountItem);
-            model.addAttribute("message", "Giỏ hàng của bạn trống! Vui lòng thêm sản phẩm vào giỏ.");
-            return "Cart";
-        }
-
-        // Nếu giỏ hàng không trống
-        BigDecimal totalAmount = cart.stream()
-                .map(product -> product.getProductPrice().multiply(BigDecimal.valueOf(1))) // Giả sử mỗi sản phẩm có số lượng = 1
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        // Tạo đơn hàng mới
-        Orders order = new Orders();
-        order.setUser(user);
-        order.setOrderDate(LocalDateTime.now());
-        order.setTotalAmount(totalAmount);
-        orderRepository.save(order);
-
-        for (Product product : cart) {
-            // Kiểm tra xem sản phẩm đã có trong đơn hàng chưa
-            OrderItem existingOrderItem = orderItemRepository.findByOrdersAndProduct(order, product);
-
-            if (existingOrderItem != null) {
-                // Nếu có, cập nhật số lượng và giá
-                existingOrderItem.setQuantity(existingOrderItem.getQuantity() + 1);
-                existingOrderItem.setPrize(product.getProductPrice().multiply(BigDecimal.valueOf(existingOrderItem.getQuantity())));
-                orderItemRepository.save(existingOrderItem);  // Cập nhật vào cơ sở dữ liệu
-            } else {
-                // Nếu chưa có, tạo OrderItem mới
-                OrderItem orderItem = new OrderItem();
-                orderItem.setProduct(product);
-                orderItem.setQuantity(1);  // Giả sử mỗi lần thêm vào giỏ hàng là 1
-                orderItem.setPrize(product.getProductPrice());
-                orderItem.setDeleteFlg(false);  // Đánh dấu chưa bị xóa
-                orderItem.setOrders(order);
-                orderItemRepository.save(orderItem);  // Lưu vào cơ sở dữ liệu
-            }
-        }
-
-        userCarts.put(userId, new ArrayList<>());
 
 
-        List<OrderItem> orderItems = orderItemRepository.findByOrdersOrderId(order.getOrderId());
-        model.addAttribute("orderItems", orderItems);
 
 
-        BigDecimal totalAmountItem = orderItems.stream()
-                .map(orderItem -> orderItem.getPrize().multiply(BigDecimal.valueOf(orderItem.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        model.addAttribute("totalAmountItem", totalAmountItem);
 
-        return "Cart";
-    }
+
+
+
 
 
 

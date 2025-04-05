@@ -31,9 +31,9 @@ public class JobCompletionNotificationListener implements JobExecutionListener {
                 jdbcTemplate
                         .query("SELECT productName, productPrize, categoryId, deleteFlg FROM product", new DataClassRowMapper<>(Product.class))
                         .forEach(product -> {
-                            // Check if the product is null
+
                             if (product != null) {
-                                // Log detailed information about the product
+
                                 log.info("Found product: Name = {}, Price = {}, Category ID = {}, Delete Flag = {}",
                                         product.getProductName(),
                                         product.getProductPrice(),
@@ -46,6 +46,10 @@ public class JobCompletionNotificationListener implements JobExecutionListener {
             } catch (Exception e) {
                 log.error("Error occurred while querying the database: {}", e.getMessage());
             }
+        }
+        if (jobExecution.getStatus() == BatchStatus.FAILED) {
+            jobExecution.setStatus(BatchStatus.STOPPED);
+            log.info("Job stopped due to error: {}", jobExecution.getExitStatus());
         }
     }
 }

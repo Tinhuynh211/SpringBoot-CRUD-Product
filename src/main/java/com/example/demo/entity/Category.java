@@ -15,8 +15,8 @@ public class Category {
     private String categoryName;
     private boolean deleteFlg;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Product> products = new ArrayList<Product>();
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private List<Product> products;
 
     public Category() {}
 

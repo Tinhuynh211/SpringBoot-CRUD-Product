@@ -90,12 +90,12 @@
 </head>
 <body>
 
-<!-- Header with navigation links -->
-<header>
+<!-- Import Header -->
+<div th:replace="~{layout/header}"></div>
 
-    <a href="/identity/users">Users</a>
 
-</header>
+
+
 
 <div class="container">
     <h2>User List</h2>
@@ -123,14 +123,14 @@
                         <button>List Order</button>
                     </a>
                 </td>
-
-
-
             </tr>
         </th:block>
         </tbody>
     </table>
 </div>
+
+<!-- Thêm FontAwesome cho icon -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
 </body>
 </html>

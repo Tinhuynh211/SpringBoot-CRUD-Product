@@ -57,6 +57,9 @@ public class ReadCSVtoDBBatchConfiguration {
         return reader;
     }
 
+
+
+
     @Bean
     public ProductItemProcessor processor() {
         return new ProductItemProcessor();

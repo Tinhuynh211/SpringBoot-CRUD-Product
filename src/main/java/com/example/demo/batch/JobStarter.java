@@ -25,6 +25,7 @@ public class JobStarter implements CommandLineRunner {
     public void run(String... args) throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addLong("startAt", System.currentTimeMillis())
+
                 .toJobParameters();
 
         jobLauncher.run(exportDatabaseToCsvJob, jobParameters);

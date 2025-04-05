@@ -8,12 +8,15 @@ import java.math.BigDecimal;
 @Entity
 public class OrderItem {
     @Id
-    @GeneratedValue ( strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int orderItemId;
 
     @ManyToOne
     @JoinColumn(name = "OrderId")
     private Orders orders;
+
+    public OrderItem() {
+    }
 
     public Product getProduct() {
         return product;
@@ -34,6 +37,8 @@ public class OrderItem {
     @ManyToOne
     @JoinColumn(name = "productId")
     private Product product;
+
+
 
     private int quantity;
     private BigDecimal prize;

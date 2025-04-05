@@ -20,13 +20,26 @@ public class Product {
 
     private boolean deleteFlg;
 
+    private String imageUrl;
+
     public Product() {}
 
-    public Product(String productName, BigDecimal productPrice, Category category, boolean deleteFlg) {
-        this.productName = productName;
-        this.productPrice = productPrice;
-        this.category = category;
+
+    public Product(String imageUrl, boolean deleteFlg, Category category, BigDecimal productPrice, String productName, int productId) {
+        this.imageUrl = imageUrl;
         this.deleteFlg = deleteFlg;
+        this.category = category;
+        this.productPrice = productPrice;
+        this.productName = productName;
+        this.productId = productId;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public int getProductId() {

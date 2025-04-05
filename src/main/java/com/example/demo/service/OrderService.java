@@ -35,6 +35,17 @@ public class OrderService {
     private CartService cartService;
 
 
+    @Transactional
+    public void saveOrderWithItems(Orders order, List<OrderItem> orderItems) {
+        Orders savedOrder = orderRepository.save(order);
+
+        for (OrderItem item : orderItems) {
+            item.setOrder(savedOrder);
+            orderItemRepository.save(item);
+        }
+    }
+
+
 
     @Transactional
     public void confirmPayment(int orderId) {
